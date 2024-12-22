@@ -28,6 +28,51 @@ chrome.runtime.onMessage.addListener((message) => {
       console.log(`[MinusAds] Captured image dimensions: ${img.width}x${img.height}`);
     };
 
+    // Check if GPT-4o Vision detected an ad
+    if (serverResult.is_ad) {
+      // Step 1: Create the overlay div
+      let overlay = document.getElementById("minusads-overlay");
+      if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.id = "minusads-overlay";
+        document.body.appendChild(overlay);
+      }
+
+      // Step 2: Style the overlay
+      overlay.style.position = "fixed";
+      overlay.style.top = "0";
+      overlay.style.left = "0";
+      overlay.style.width = "100vw";
+      overlay.style.height = "100vh";
+      overlay.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+      overlay.style.display = "flex";
+      overlay.style.justifyContent = "center";
+      // overlay.style.alignItems = "center";
+      overlay.style.zIndex = "9999";
+
+      // Step 3: Replace overlay content with a replacement image
+      const replacementImageUrl = "https://www.indy100.com/media-library/people-who-found-fame-through-a-meme.png?id=54837721";
+      overlay.innerHTML = `
+        <div style="position: relative;">
+          <img src="${replacementImageUrl}" alt="Replacement Image" style="width:100%; height: 100%;" />
+          <button id="close-overlay" style="position: absolute; top: 10px; right: 10px; background: red; color: white; border: none; padding: 5px 10px; cursor: pointer;">X</button>
+        </div>
+      `;
+
+      // Optional: Close the overlay on click or button
+      overlay.addEventListener("click", (e) => {
+        if (e.target.id === "close-overlay" || e.target === overlay) {
+          overlay.remove();
+        }
+      });
+
+      console.log("Ad detected! Overlay displayed.");
+    } else {
+      console.log("No ad detected.");
+    }
+    
+
+    // 2) Log the GPT-4o Vision result
     console.log("[MinusAds] GPT-4o API response:", serverResult);
   }
   else if (message.action === "start-capturing") {
