@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MinusAds</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        padding: 10px;
+      }
+      button {
+        margin-top: 5px;
+        padding: 5px 10px;
+        display: block;
+        cursor: pointer;
+      }
+      #apiKeyContainer {
+        margin-top: 10px;
+      }
+      #apiKeyInput {
+        width: 200px;
+      }
+      #screenshotImg {
+        width: 150px;
+        height: auto;
+        border: 1px solid #ccc;
+        margin-top: 10px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>MinusAds</h1>
+
+    <!-- Start / Stop capturing -->
+    <button id="startBtn">Start</button>
+    <button id="stopBtn">Stop</button>
+    <button id="showBtn">Show Latest</button>
+
+    <!-- GPT-4o API Key area -->
+    <div id="apiKeyContainer">
+      <label for="apiKeyInput">GPT-4o API Key:</label><br />
+      <input id="apiKeyInput" type="password" placeholder="Enter your API key..." />
+      <button id="toggleKeyBtn">Show Key</button>
+      <button id="saveKeyBtn">Save Key</button>
+    </div>
+
+    <!-- Latest screenshot -->
+    <img id="screenshotImg" src="" alt="Latest Screenshot" />
+
+    <script src="popup.js"></script>
+  </body>
+</html>

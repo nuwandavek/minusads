@@ -1,0 +1,27 @@
+{
+  "name": "MinusAds",
+  "version": "1.0",
+  "manifest_version": 3,
+  "description": "Periodically captures screenshots, logs them in console, queries GPT-4o Vision, and displays the latest in popup.",
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://api.openai.com/v1/chat/completions"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}
