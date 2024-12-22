@@ -1,28 +1,50 @@
-// background.js (service_worker in Manifest V3)
-
 let lastScreenshotDataUrl = "";
 
-// Fired whenever the content script or popup sends us a message
+async function blobToDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function scaleDown(imageBitmap, n) {
+  const newWidth = Math.floor(imageBitmap.width / n);
+  const newHeight = Math.floor(imageBitmap.height / n);
+
+  const offscreen = new OffscreenCanvas(newWidth, newHeight);
+  const ctx = offscreen.getContext("2d");
+  ctx.drawImage(imageBitmap, 0, 0, newWidth, newHeight);
+
+  const scaledBlob = await offscreen.convertToBlob({ type: "image/png" });
+  return blobToDataUrl(scaledBlob);
+}
+
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   if (message.action === "auto-capture") {
-    // Step 1: Find the active tab
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab) {
       console.error("No active tab to capture.");
       return;
     }
 
-    // Step 2: Capture the screenshot (Base64 data URL)
     try {
-      const imageDataUrl = await chrome.tabs.captureVisibleTab();
-      lastScreenshotDataUrl = imageDataUrl;
+      // step1. get the full screenshot
+      const fullDataUrl = await chrome.tabs.captureVisibleTab();
+      // step2. scale down the image
+      const blob = await (await fetch(fullDataUrl)).blob();
+      // step3. convert the blob to an ImageBitmap
+      const imageBitmap = await createImageBitmap(blob);
+      // step4. scale down the ImageBitmap
+      const n = 4;
+      const scaledDataUrl = await scaleDown(imageBitmap, n);
 
-      // Retrieve the GPT-4o API key from storage
+      lastScreenshotDataUrl = scaledDataUrl;
+
       chrome.storage.sync.get("gpt4oApiKey", async (data) => {
-        const apiKey = data.gpt4oApiKey || ""; // empty if none saved
+        const apiKey = data.gpt4oApiKey || "";
 
-        // We always send the screenshot data to the content script for dimension logging
-        // Then, if we have an API key, we also call GPT-4o Vision
         let gptResult = { error: "No API key provided" };
 
         if (apiKey) {
@@ -42,7 +64,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
                         {
                           "type": "image_url",
                           "image_url": {
-                            "url": imageDataUrl,
+                            "url": scaledDataUrl,
                             "detail": "low"
                           }
                         },
@@ -95,7 +117,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         // Send everything back to content script so it can log in the console
         chrome.tabs.sendMessage(tab.id, {
           type: "SCREENSHOT_DATA",
-          imageDataUrl,
+          scaledDataUrl,
           serverResult: gptResult
         });
       });
@@ -105,6 +127,6 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   }
   else if (message.action === "get-latest-screenshot") {
     // Popup wants the last captured screenshot for display
-    sendResponse({ imageDataUrl: lastScreenshotDataUrl });
+    sendResponse({ scaledDataUrl: lastScreenshotDataUrl });
   }
 });

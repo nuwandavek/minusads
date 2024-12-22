@@ -1,5 +1,3 @@
-// popup.js
-
 document.addEventListener("DOMContentLoaded", async () => {
   const startBtn = document.getElementById("startBtn");
   const stopBtn = document.getElementById("stopBtn");
@@ -68,8 +66,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("Error retrieving screenshot:", chrome.runtime.lastError);
         return;
       }
-      if (response && response.imageDataUrl) {
-        screenshotImg.src = response.imageDataUrl;
+      if (response && response.scaledDataUrl) {
+        screenshotImg.src = response.scaledDataUrl;
         screenshotImg.style.display = "block";
       } else {
         screenshotImg.src = "";
