@@ -30,18 +30,43 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     }
 
     try {
-      // step1. get the full screenshot
+      // Step 1: Hide the overlay
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: () => {
+          const overlay = document.getElementById("minusads-overlay");
+          if (overlay) {
+            console.log("MinusAds: Hiding overlay for screenshot capture");
+            overlay.style.visibility = 'hidden'; // Temporarily hide the overlay
+            overlay.dataset.wasHidden = "true"; // Mark it for restoration
+          }
+        },
+      });
+
+      // Step 2: Capture the screenshot 
+      await new Promise((resolve) => setTimeout(resolve, 100)); // Wait 100ms for overlay to hide
       const fullDataUrl = await chrome.tabs.captureVisibleTab();
-      // step2. scale down the image
+
+      // Step 3: Restore the overlay
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: () => {
+          const overlay = document.getElementById("minusads-overlay");
+          if (overlay && overlay.dataset.wasHidden === "true") {
+            overlay.style.visibility = ''; // Restore visibility
+            delete overlay.dataset.wasHidden;
+          }
+        },
+      });
+
+      // Step 4: Scale down the captured image
       const blob = await (await fetch(fullDataUrl)).blob();
-      // step3. convert the blob to an ImageBitmap
       const imageBitmap = await createImageBitmap(blob);
-      // step4. scale down the ImageBitmap
-      const n = 4;
-      const scaledDataUrl = await scaleDown(imageBitmap, n);
+      const scaledDataUrl = await scaleDown(imageBitmap, 4);
 
       lastScreenshotDataUrl = scaledDataUrl;
 
+      // Step 5: Send the screenshot to GPT-4o Vision
       chrome.storage.sync.get("gpt4oApiKey", async (data) => {
         const apiKey = data.gpt4oApiKey || "";
 
@@ -105,7 +130,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
 
             const res = await response.json();
             gptResult = {
-              is_ad: JSON.parse(res.choices[0].message.content),
+              is_ad: JSON.parse(res.choices[0].message.content).is_ad,
               fullResponse: res
             }
           } catch (apiError) {
@@ -124,8 +149,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     } catch (captureError) {
       console.error("Error capturing screenshot:", captureError);
     }
-  }
-  else if (message.action === "get-latest-screenshot") {
+  } else if (message.action === "get-latest-screenshot") {
     // Popup wants the last captured screenshot for display
     sendResponse({ scaledDataUrl: lastScreenshotDataUrl });
   }
