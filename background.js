@@ -26,9 +26,6 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         let gptResult = { error: "No API key provided" };
 
         if (apiKey) {
-          // Example question
-          const question = "Is this a sports game?";
-
           try {
             const response = await fetch("https://api.openai.com/v1/chat/completions", {
               method: "POST",
@@ -85,7 +82,10 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             });
 
             const res = await response.json();
-            gptResult = JSON.parse(res.choices[0].message.content)
+            gptResult = {
+              is_ad: JSON.parse(res.choices[0].message.content),
+              fullResponse: res
+            }
           } catch (apiError) {
             gptResult = { error: String(apiError) };
             console.error("Error calling GPT-4o Vision API:", apiError);
