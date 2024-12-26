@@ -30,43 +30,18 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     }
 
     try {
-      // Step 1: Hide the overlay
-      await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: () => {
-          const overlay = document.getElementById("minusads-overlay");
-          if (overlay) {
-            console.log("MinusAds: Hiding overlay for screenshot capture");
-            overlay.style.visibility = 'hidden'; // Temporarily hide the overlay
-            overlay.dataset.wasHidden = "true"; // Mark it for restoration
-          }
-        },
-      });
-
-      // Step 2: Capture the screenshot 
+      // Step 1: Capture the screenshot 
       await new Promise((resolve) => setTimeout(resolve, 100)); // Wait 100ms for overlay to hide
       const fullDataUrl = await chrome.tabs.captureVisibleTab();
-
-      // Step 3: Restore the overlay
-      await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: () => {
-          const overlay = document.getElementById("minusads-overlay");
-          if (overlay && overlay.dataset.wasHidden === "true") {
-            overlay.style.visibility = ''; // Restore visibility
-            delete overlay.dataset.wasHidden;
-          }
-        },
-      });
-
-      // Step 4: Scale down the captured image
+      
+      // Step 2: Scale down the captured image
       const blob = await (await fetch(fullDataUrl)).blob();
       const imageBitmap = await createImageBitmap(blob);
       const scaledDataUrl = await scaleDown(imageBitmap, 4);
 
       lastScreenshotDataUrl = scaledDataUrl;
 
-      // Step 5: Send the screenshot to GPT-4o Vision
+      // Step 3: Send the screenshot to GPT-4o Vision
       chrome.storage.sync.get("gpt4oApiKey", async (data) => {
         const apiKey = data.gpt4oApiKey || "";
 

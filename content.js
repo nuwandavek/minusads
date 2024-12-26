@@ -20,51 +20,89 @@ function stopCapturing() {
 }
 
 function addOverlay() {
-  console.log("MinusAds: Ad detected! Overlay displayed.");
-  // Step 1: Create the overlay div
+
+  // Step 1: Create the bottom overlay container
   let overlay = document.getElementById("minusads-overlay");
   if (!overlay) {
+    console.log("MinusAds: Ad detected! Adding responsive, sleek bottom overlay.");
     overlay = document.createElement("div");
     overlay.id = "minusads-overlay";
     document.body.appendChild(overlay);
+  } else {
+    console.log("MinusAds: Ad detected, but overlay already exists.");
+    return;
   }
 
-  // Step 2: Style the overlay
+  // Step 2: Style the overlay container
   overlay.style.position = "fixed";
-  overlay.style.top = "0";
+  overlay.style.bottom = "0";
   overlay.style.left = "0";
-  overlay.style.width = "100vw";
-  overlay.style.height = "100vh";
-  overlay.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
-  overlay.style.display = "flex";
-  overlay.style.justifyContent = "center";
-  // overlay.style.alignItems = "center";
+  overlay.style.width = "100%";
+  overlay.style.backgroundColor = "#2A2E35"; // Sleek, professional dark background
+  overlay.style.color = "#FFF";
+  overlay.style.fontFamily = "'Roboto', sans-serif";
   overlay.style.zIndex = "9999";
+  overlay.style.boxShadow = "0px -2px 8px rgba(0, 0, 0, 0.5)";
+  overlay.style.padding = "10px 20px";
+  overlay.style.display = "flex";
+  overlay.style.justifyContent = "space-between";
+  overlay.style.alignItems = "center";
+  overlay.style.flexWrap = "wrap"; // Allows breaking on smaller screens
 
-  // Step 3: Replace overlay content with a replacement image
-  const replacementImageUrl = "https://www.indy100.com/media-library/people-who-found-fame-through-a-meme.png?id=54837721";
+  // Step 3: Add content to the overlay
   overlay.innerHTML = `
-    <div style="position: relative;">
-      <img src="${replacementImageUrl}" alt="Replacement Image" style="width:100%; height: 100%;" />
-      <button id="close-overlay" style="position: absolute; top: 10px; right: 10px; background: red; color: white; border: none; padding: 5px 10px; cursor: pointer;">X</button>
+    <div style="flex: 1; min-width: 200px; font-size: 16px;">
+      <strong style="color: #00A8E8;">Ad Detected:</strong> Muted for your convenience.
     </div>
+    <button id="close-overlay" style="
+      background: #00A8E8;
+      color: #FFF;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      min-width: 100px;">
+      Dismiss
+    </button>
   `;
 
-  // Optional: Close the overlay on click or button
-  overlay.addEventListener("click", (e) => {
-    if (e.target.id === "close-overlay" || e.target === overlay) {
-      overlay.remove();
-    }
+  // Step 4: Add event listener to dismiss the overlay
+  const closeButton = overlay.querySelector("#close-overlay");
+  closeButton.addEventListener("click", () => {
+    removeOverlay();
+  });
+
+  // Step 5: Auto-mute on ad detect
+  const videoElements = document.querySelectorAll("video, audio");
+  videoElements.forEach((element) => {
+    element.dataset.previousVolume = element.volume || "0.5"; // Save current volume, default to 0.5
+    element.volume = 0; // Mute
+    element.muted = true;
   });
 }
 
 function removeOverlay() {
-  console.log("MinusAds: No ad detected, removing overlay if it exists");
-  let overlay = document.getElementById("minusads-overlay");
+  const overlay = document.getElementById("minusads-overlay");
   if (overlay) {
+    console.log("MinusAds: Removing bottom overlay.");
     overlay.remove();
+  } else {
+    console.log("MinusAds: No overlay to remove.");
   }
+
+  // Step 6: Unmute on ad gone
+  const videoElements = document.querySelectorAll("video, audio");
+  videoElements.forEach((element) => {
+    if (element.dataset.previousVolume !== undefined) {
+      element.volume = parseFloat(element.dataset.previousVolume); // Restore volume
+      element.muted = false;
+      delete element.dataset.previousVolume;
+    }
+  });
 }
+
 
 chrome.runtime.onMessage.addListener((message) => {
   if (message.type === "SCREENSHOT_DATA") {
