@@ -20,10 +20,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   toggleKeyBtn.addEventListener("click", () => {
     if (apiKeyInput.type === "password") {
       apiKeyInput.type = "text";
-      toggleKeyBtn.textContent = "Hide Key";
+      toggleKeyBtn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+      toggleKeyBtn.setAttribute("aria-label", "Hide API Key");
     } else {
       apiKeyInput.type = "password";
-      toggleKeyBtn.textContent = "Show Key";
+      toggleKeyBtn.innerHTML = '<i class="bi bi-eye"></i>';
+      toggleKeyBtn.setAttribute("aria-label", "Show API Key");
     }
   });
 
@@ -80,9 +82,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // Hide "Show Latest Screenshot" if not in debug mode
-  const DEBUG_MODE = false; // Change to `true` for enabling debug features
+  const DEBUG_MODE = false; // set to true for debug
   if (!DEBUG_MODE) {
     showBtn.style.display = "none";
     screenshotImg.style.display = "none";
+    startBtn.style.display = "none";
+    stopBtn.style.display = "none";
+  }
+});
+
+// Retrieve blocked minutes and display in popup
+chrome.storage.sync.get("blockedMinutes", (data) => {
+  const minutesBlocked = document.getElementById("minutesBlocked");
+  if (data.blockedMinutes) {
+    minutesBlocked.textContent = data.blockedMinutes;
   }
 });

@@ -1,6 +1,15 @@
-
 const IS_AD_EVAL_INTERVAL = 5_000;
 let capturingIntervalId = null;
+let blockedMinutes = 0;
+let isBlockingAd = false; // Tracks if we're actively blocking ads
+let blockTimerId = null;
+
+// Initialize blocked minutes from storage
+chrome.storage.sync.get("blockedMinutes", (data) => {
+  if (data.blockedMinutes) {
+    blockedMinutes = data.blockedMinutes;
+  }
+});
 
 function startCapturing() {
   if (!capturingIntervalId) {
@@ -19,7 +28,29 @@ function stopCapturing() {
   }
 }
 
+function startBlockedTimer() {
+  if (!blockTimerId) {
+    blockTimerId = setInterval(() => {
+      blockedMinutes++;
+      chrome.storage.sync.set({ blockedMinutes });
+      console.log(`[MinusAds] Total blocked minutes: ${blockedMinutes}`);
+    }, 60_000); // Increment every minute
+  }
+}
+
+function stopBlockedTimer() {
+  if (blockTimerId) {
+    clearInterval(blockTimerId);
+    blockTimerId = null;
+  }
+}
+
 function addOverlay() {
+  if (isBlockingAd) return; // Prevent duplicate overlays
+  isBlockingAd = true;
+
+  // Start tracking blocked minutes
+  startBlockedTimer();
 
   // Step 1: Create the bottom overlay container
   let overlay = document.getElementById("minusads-overlay");
@@ -28,9 +59,6 @@ function addOverlay() {
     overlay = document.createElement("div");
     overlay.id = "minusads-overlay";
     document.body.appendChild(overlay);
-  } else {
-    console.log("MinusAds: Ad detected, but overlay already exists.");
-    return;
   }
 
   // Step 2: Style the overlay container
@@ -88,9 +116,11 @@ function removeOverlay() {
   if (overlay) {
     console.log("MinusAds: Removing bottom overlay.");
     overlay.remove();
-  } else {
-    console.log("MinusAds: No overlay to remove.");
   }
+
+  // Stop tracking blocked minutes if no ads are detected
+  stopBlockedTimer();
+  isBlockingAd = false;
 
   // Step 6: Unmute on ad gone
   const videoElements = document.querySelectorAll("video, audio");
@@ -103,15 +133,9 @@ function removeOverlay() {
   });
 }
 
-
 chrome.runtime.onMessage.addListener((message) => {
   if (message.type === "SCREENSHOT_DATA") {
     const { scaledDataUrl, serverResult } = message;
-    const img = new Image();
-    img.src = scaledDataUrl;
-    img.onload = () => {
-      console.log(`[MinusAds] Captured image dimensions: ${img.width}x${img.height}`);
-    };
 
     // Check if GPT-4o Vision detected an ad
     if (serverResult.is_ad === true) {
@@ -119,15 +143,9 @@ chrome.runtime.onMessage.addListener((message) => {
     } else {
       removeOverlay();
     }
-    
-
-    // 2) Log the GPT-4o Vision result
-    // console.log("[MinusAds] GPT-4o API response:", serverResult);
-  }
-  else if (message.action === "start-capturing") {
+  } else if (message.action === "start-capturing") {
     startCapturing();
-  }
-  else if (message.action === "stop-capturing") {
+  } else if (message.action === "stop-capturing") {
     stopCapturing();
   }
 });

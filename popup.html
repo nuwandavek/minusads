@@ -4,46 +4,92 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MinusAds</title>
+    <!-- Link to our popup.css -->
     <link rel="stylesheet" href="popup.css" />
   </head>
+
   <body>
-    <div class="container">
-      <header class="header">
-        <h1>Minus<span class="highlight">Ads</span></h1>
-        <p class="subtitle">Declutter your browsing experience.</p>
-      </header>
+    <div class="header-section">
+      <h1 class="header-title">
+        Minus<span class="accent">Ads</span>
+      </h1>
+      <p class="header-subtitle">No more ads on videos</p>
+    </div>
 
-      <main>
-        <section class="status-section">
-          <label for="statusToggle" class="status-label">
-            MinusAds Status:
+    <!-- Main Container -->
+    <div class="main-container">
+      <!-- Toggle Section -->
+      <section class="toggle-section">
+        <div class="toggle-header">
+          <span class="toggle-label">Block</span>
+          <label class="switch">
+            <input type="checkbox" id="statusToggle" />
+            <span class="slider"></span>
           </label>
-          <input id="statusToggle" type="checkbox" class="toggle-switch" />
-        </section>
+        </div>
+        <p class="minutes-blocked">
+          <span id="minutesBlocked">0</span> minutes of ads blocked
+        </p>
+      </section>
 
-        <!-- Debug Mode: Show this only in debug mode -->
-        <section id="debugSection" class="actions-section hidden">
-          <button id="showScreenshotBtn" class="button">
-            Show Latest Screenshot
+      <hr class="divider" />
+
+      <!-- API Key Section -->
+      <section class="api-section">
+        <label for="apiKeyInput" class="api-label">OpenAI API Key</label>
+        <div class="api-input-wrapper">
+          <input
+            id="apiKeyInput"
+            type="password"
+            class="api-input"
+            placeholder="Enter your API key..."
+          />
+          <!-- Eye Icon for Show/Hide -->
+          <button
+            id="toggleKeyBtn"
+            class="icon-button"
+            type="button"
+            aria-label="Show API Key"
+          >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+            <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+            <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+          </svg>
           </button>
-        </section>
 
-        <section class="api-key-section">
-          <label for="apiKeyInput" class="label">GPT-4o API Key</label>
-          <div class="api-key-input-container">
-            <input
-              id="apiKeyInput"
-              type="password"
-              class="input"
-              placeholder="Enter your API key..."
-            />
-            <button id="toggleKeyBtn" class="button-small">
-              Show Key
-            </button>
-          </div>
-          <button id="saveKeyBtn" class="button">Save Key</button>
-        </section>
-      </main>
+
+
+          <button
+          id="saveKeyBtn"
+          class="save-button"
+          type="button"
+          aria-label="Save API Key"
+        >
+          Save
+        </button>
+
+
+        </div>
+
+
+        <!-- Feedback message -->
+        <div id="saveFeedback" class="feedback hidden">
+          API Key saved successfully!
+        </div>
+      </section>
+
+      <!-- Debug/Development Section (hidden unless DEBUG_MODE = true) -->
+      <section class="debug-section">
+        <button id="startBtn" class="debug-button">Start Capturing</button>
+        <button id="stopBtn" class="debug-button">Stop Capturing</button>
+        <button id="showBtn" class="debug-button">Show Latest Screenshot</button>
+        <img
+          id="screenshotImg"
+          alt="Latest Screenshot"
+          class="debug-image"
+          style="display: none"
+        />
+      </section>
     </div>
 
     <script src="popup.js"></script>

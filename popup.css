@@ -1,173 +1,220 @@
-/* General Reset */
+/* ---------- RESET & BASE ---------- */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
   }
-  
-  body {
-    font-family: 'Inter', sans-serif;
-    background-color: #000;
-    color: #fff;
-    padding: 16px;
-    width: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  /* Remove all outlines */
+  /* Remove default focus outline for cleaner look */
   *:focus {
     outline: none !important;
   }
   
-  /* Container */
-  .container {
-    width: 100%;
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #000; /* Dark page background */
+    color: #fff;
+    width: 315px;
+    margin: 0 auto;
+    padding: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
   }
   
-  /* Header */
-  .header {
+  /* ---------- HEADER SECTION ---------- */
+  .header-section {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
   }
-  
-  .header h1 {
-    font-size: 24px;
+  .header-title {
+    font-size: 20px;
     font-weight: 700;
-    color: #fff;
+    margin-bottom: 2px;
+  }
+  .accent {
+    color: #55d6be; /* Accent color */
+  }
+  .header-subtitle {
+    font-size: 12px;
+    color: #aaa;
   }
   
-  .highlight {
-    color: #55d6be;
-  }
-  
-  .subtitle {
-    font-size: 14px;
-    color: #888;
-    margin-top: 4px;
-  }
-  
-  /* Sections */
-  .status-section,
-  .api-key-section {
+  /* ---------- MAIN CONTAINER ---------- */
+  .main-container {
     width: 100%;
-    margin-bottom: 20px;
+    background-color: #111; /* Slightly lighter than page background */
+    border-radius: 6px;
+    padding: 12px;
   }
   
-  /* Status Section */
-  .status-section {
+  /* ---------- TOGGLE SECTION ---------- */
+  .toggle-section {
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 400px; /* or whatever width feels good */
+  }
+  .toggle-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
-  
-  .status-label {
-    font-size: 16px;
-    font-weight: 500;
-  }
-  
-  .toggle-switch {
-    width: 50px;
-    height: 24px;
-    appearance: none;
-    background-color: #333;
-    border-radius: 24px;
-    position: relative;
-    cursor: pointer;
-    border: none;
-  }
-  
-  .toggle-switch:checked {
-    background-color: #55d6be;
-  }
-  
-  .toggle-switch:before {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 20px;
-    height: 20px;
-    background-color: #fff;
-    border-radius: 50%;
-    transition: transform 0.2s ease;
-  }
-  
-  .toggle-switch:checked:before {
-    transform: translateX(26px);
-  }
-  
-  /* Buttons */
-  .button {
-    background-color: #55d6be;
-    color: #000;
-    border: none;
-    padding: 10px 12px;
-    border-radius: 4px;
+  .toggle-label {
     font-size: 14px;
     font-weight: 600;
+    margin-right: 6px;
+  }
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+  }
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .slider {
+    position: absolute;
     cursor: pointer;
-    text-align: center;
-    transition: background-color 0.3s ease;
-    width: 100%;
-  }
-  
-  .button:hover {
-    background-color: #44c3a9;
-  }
-  
-  .button-small {
-    background-color: #333;
-    color: #fff;
-    border: none;
-    padding: 8px 10px;
-    font-size: 12px;
-    border-radius: 4px;
-    margin-left: 8px;
-    flex-shrink: 0;
-  }
-  
-  .button-small:hover {
+    top: 0; left: 0; right: 0; bottom: 0;
     background-color: #444;
+    border-radius: 20px;
+    transition: 0.4s;
+  }
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #fff;
+    border-radius: 50%;
+    transition: 0.4s;
+  }
+  input:checked + .slider {
+    background-color: #55d6be;
+  }
+  input:checked + .slider:before {
+    transform: translateX(20px);
+  }
+  .minutes-blocked {
+    font-size: 12px;
+    color: #aaa;
+    margin-top: 6px;
+    text-align: center;
   }
   
-  /* Inputs */
-  .input {
+  /* ---------- DIVIDER ---------- */
+  .divider {
     width: 100%;
-    padding: 10px;
+    height: 1px;
+    background-color: #222;
+    border: none;
+    margin: 12px 0;
+  }
+  
+  /* ---------- API KEY SECTION ---------- */
+  .api-section {
+    margin-bottom: 12px;
+
+  }
+  .api-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .api-input-wrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+    width: 200px;
+  }
+  .api-input {
+    flex-grow: 1;
+    padding: 8px;
     background-color: #222;
     color: #fff;
     border: 1px solid #444;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 12px;
+    margin-right: 6px;
+    padding-right: 35px;
   }
-  
-  .api-key-input-container {
+  .icon-button {
+    width: 27px;
+    height: 27px;
+    background-color: #222;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
     display: flex;
     align-items: center;
-    width: 100%;
-    margin-bottom: 8px;
+    justify-content: center;
+    position: absolute;
+    left: 164px;   
+  }
+
+  .icon-button:hover {
+    background-color: #333;
   }
   
-  /* Align buttons and inputs properly */
-  .api-key-section .button {
-    margin-top: 8px;
+  /* Small button for "Save Key" */
+  .save-button {
+    padding: 8px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    background-color: #222;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  .save-button:hover {
+    background-color: #333;
   }
   
-  /* Debug Section */
+  .feedback {
+    font-size: 12px;
+    color: #55d6be;
+  }
   .hidden {
-    display: none;
+    display: none !important;
   }
   
-  /* Screenshot Section */
-  .screenshot {
-    display: none;
-    max-width: 100%;
-    border: 1px solid #333;
-    border-radius: 8px;
-    margin-top: 16px;
+  /* ---------- DEBUG SECTION ---------- */
+  .debug-section {
+    margin-top: 12px;
+  }
+  .debug-button {
+    display: block;
+    width: 100%;
+    font-size: 12px;
+    padding: 8px 0;
+    margin-bottom: 6px;
+    background-color: #222;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+  }
+  .debug-button:hover {
+    background-color: #333;
+  }
+  .debug-image {
+    width: 100%;
+    max-height: 150px;
+    margin-top: 6px;
+    object-fit: cover;
+    border: 1px solid #444;
+    display: block; /* Toggled on/off via JS */
   }
