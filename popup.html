@@ -1,52 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MinusAds</title>
-    <style>
-      body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        padding: 10px;
-      }
-      button {
-        margin-top: 5px;
-        padding: 5px 10px;
-        display: block;
-        cursor: pointer;
-      }
-      #apiKeyContainer {
-        margin-top: 10px;
-      }
-      #apiKeyInput {
-        width: 200px;
-      }
-      #screenshotImg {
-        width: 150px;
-        height: auto;
-        border: 1px solid #ccc;
-        margin-top: 10px;
-        display: none;
-      }
-    </style>
+    <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
-    <h1>MinusAds</h1>
+    <div class="container">
+      <header class="header">
+        <h1>Minus<span class="highlight">Ads</span></h1>
+        <p class="subtitle">Declutter your browsing experience.</p>
+      </header>
 
-    <!-- Start / Stop capturing -->
-    <button id="startBtn">Start</button>
-    <button id="stopBtn">Stop</button>
-    <button id="showBtn">Show Latest</button>
+      <main>
+        <section class="status-section">
+          <label for="statusToggle" class="status-label">
+            MinusAds Status:
+          </label>
+          <input id="statusToggle" type="checkbox" class="toggle-switch" />
+        </section>
 
-    <!-- GPT-4o API Key area -->
-    <div id="apiKeyContainer">
-      <label for="apiKeyInput">GPT-4o API Key:</label><br />
-      <input id="apiKeyInput" type="password" placeholder="Enter your API key..." />
-      <button id="toggleKeyBtn">Show Key</button>
-      <button id="saveKeyBtn">Save Key</button>
+        <!-- Debug Mode: Show this only in debug mode -->
+        <section id="debugSection" class="actions-section hidden">
+          <button id="showScreenshotBtn" class="button">
+            Show Latest Screenshot
+          </button>
+        </section>
+
+        <section class="api-key-section">
+          <label for="apiKeyInput" class="label">GPT-4o API Key</label>
+          <div class="api-key-input-container">
+            <input
+              id="apiKeyInput"
+              type="password"
+              class="input"
+              placeholder="Enter your API key..."
+            />
+            <button id="toggleKeyBtn" class="button-small">
+              Show Key
+            </button>
+          </div>
+          <button id="saveKeyBtn" class="button">Save Key</button>
+        </section>
+      </main>
     </div>
-
-    <!-- Latest screenshot -->
-    <img id="screenshotImg" src="" alt="Latest Screenshot" />
 
     <script src="popup.js"></script>
   </body>

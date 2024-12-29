@@ -9,17 +9,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const screenshotImg = document.getElementById("screenshotImg");
 
-  // Disable Stop button initially
-  // stopBtn.disabled = true;
-
-  // 1) Retrieve any saved API key to pre-fill the text box
+  // Retrieve any saved API key to pre-fill the text box
   chrome.storage.sync.get("gpt4oApiKey", (data) => {
     if (data.gpt4oApiKey) {
       apiKeyInput.value = data.gpt4oApiKey;
     }
   });
 
-  // 2) Show / Hide the API key
+  // Show / Hide the API key
   toggleKeyBtn.addEventListener("click", () => {
     if (apiKeyInput.type === "password") {
       apiKeyInput.type = "text";
@@ -30,49 +27,62 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // 3) Save the key in Chrome Storage
+  // Save the key in Chrome Storage
   saveKeyBtn.addEventListener("click", () => {
     const key = apiKeyInput.value.trim();
-    chrome.storage.sync.set({ gpt4oApiKey: key }, () => {
-      console.log("GPT-4o API key saved.");
-      alert("API key saved successfully!");
-    });
+    if (key) {
+      chrome.storage.sync.set({ gpt4oApiKey: key }, () => {
+        console.log("GPT-4o API key saved.");
+        alert("API key saved successfully!");
+      });
+    } else {
+      alert("Please enter a valid API key.");
+    }
   });
 
-  // 4) Start capturing (tells the content script to set up the interval)
+  // Start capturing (tells the content script to set up the interval)
   startBtn.addEventListener("click", async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab) return;
 
     chrome.tabs.sendMessage(tab.id, { action: "start-capturing" });
-    // startBtn.disabled = true;
-    // stopBtn.disabled = false;
+    startBtn.classList.add("disabled");
+    stopBtn.classList.remove("disabled");
   });
 
-  // 5) Stop capturing
+  // Stop capturing
   stopBtn.addEventListener("click", async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab) return;
 
     chrome.tabs.sendMessage(tab.id, { action: "stop-capturing" });
-    // startBtn.disabled = false;
-    // stopBtn.disabled = true;
+    startBtn.classList.remove("disabled");
+    stopBtn.classList.add("disabled");
   });
 
-  // 6) Show the latest screenshot (on demand)
+  // Show the latest screenshot (on demand)
   showBtn.addEventListener("click", () => {
     chrome.runtime.sendMessage({ action: "get-latest-screenshot" }, (response) => {
       if (chrome.runtime.lastError) {
         console.error("Error retrieving screenshot:", chrome.runtime.lastError);
+        alert("Error retrieving the screenshot.");
         return;
       }
       if (response && response.scaledDataUrl) {
         screenshotImg.src = response.scaledDataUrl;
         screenshotImg.style.display = "block";
       } else {
+        alert("No screenshot available.");
         screenshotImg.src = "";
         screenshotImg.style.display = "none";
       }
     });
   });
+
+  // Hide "Show Latest Screenshot" if not in debug mode
+  const DEBUG_MODE = false; // Change to `true` for enabling debug features
+  if (!DEBUG_MODE) {
+    showBtn.style.display = "none";
+    screenshotImg.style.display = "none";
+  }
 });

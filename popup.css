@@ -1,0 +1,173 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #000;
+    color: #fff;
+    padding: 16px;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* Remove all outlines */
+  *:focus {
+    outline: none !important;
+  }
+  
+  /* Container */
+  .container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+  }
+  
+  .highlight {
+    color: #55d6be;
+  }
+  
+  .subtitle {
+    font-size: 14px;
+    color: #888;
+    margin-top: 4px;
+  }
+  
+  /* Sections */
+  .status-section,
+  .api-key-section {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  /* Status Section */
+  .status-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .status-label {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .toggle-switch {
+    width: 50px;
+    height: 24px;
+    appearance: none;
+    background-color: #333;
+    border-radius: 24px;
+    position: relative;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .toggle-switch:checked {
+    background-color: #55d6be;
+  }
+  
+  .toggle-switch:before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background-color: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+  }
+  
+  .toggle-switch:checked:before {
+    transform: translateX(26px);
+  }
+  
+  /* Buttons */
+  .button {
+    background-color: #55d6be;
+    color: #000;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    width: 100%;
+  }
+  
+  .button:hover {
+    background-color: #44c3a9;
+  }
+  
+  .button-small {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 8px 10px;
+    font-size: 12px;
+    border-radius: 4px;
+    margin-left: 8px;
+    flex-shrink: 0;
+  }
+  
+  .button-small:hover {
+    background-color: #444;
+  }
+  
+  /* Inputs */
+  .input {
+    width: 100%;
+    padding: 10px;
+    background-color: #222;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .api-key-input-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  /* Align buttons and inputs properly */
+  .api-key-section .button {
+    margin-top: 8px;
+  }
+  
+  /* Debug Section */
+  .hidden {
+    display: none;
+  }
+  
+  /* Screenshot Section */
+  .screenshot {
+    display: none;
+    max-width: 100%;
+    border: 1px solid #333;
+    border-radius: 8px;
+    margin-top: 16px;
+  }
