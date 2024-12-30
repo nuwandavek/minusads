@@ -9,6 +9,38 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const screenshotImg = document.getElementById("screenshotImg");
 
+
+  const statusToggle = document.getElementById("statusToggle");
+  const minutesBlocked = document.getElementById("minutesBlocked");
+
+  // Retrieve toggle state and blocked minutes
+  chrome.storage.sync.get(["toggleState", "blockedMinutes"], (data) => {
+    if (data.toggleState !== undefined) {
+      statusToggle.checked = data.toggleState;
+    }
+    if (data.blockedMinutes !== undefined) {
+      minutesBlocked.textContent = data.blockedMinutes;
+    }
+  });
+
+  // Handle toggle switch
+  statusToggle.addEventListener("change", async () => {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab) return;
+
+    const toggleState = statusToggle.checked;
+    chrome.storage.sync.set({ toggleState });
+
+    if (toggleState) {
+      chrome.tabs.sendMessage(tab.id, { action: "start-capturing" });
+      console.log("Toggle ON: Started capturing.");
+    } else {
+      chrome.tabs.sendMessage(tab.id, { action: "stop-capturing" });
+      console.log("Toggle OFF: Stopped capturing.");
+    }
+  });
+
+
   // Retrieve any saved API key to pre-fill the text box
   chrome.storage.sync.get("gpt4oApiKey", (data) => {
     if (data.gpt4oApiKey) {
@@ -83,7 +115,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Hide "Show Latest Screenshot" if not in debug mode
   const DEBUG_MODE = false; // set to true for debug
-  if (DEBUG_MODE) {
+  if (!DEBUG_MODE) {
     showBtn.style.display = "none";
     screenshotImg.style.display = "none";
     startBtn.style.display = "none";
