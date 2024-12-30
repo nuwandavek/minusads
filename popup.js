@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Hide "Show Latest Screenshot" if not in debug mode
   const DEBUG_MODE = false; // set to true for debug
-  if (!DEBUG_MODE) {
+  if (DEBUG_MODE) {
     showBtn.style.display = "none";
     screenshotImg.style.display = "none";
     startBtn.style.display = "none";

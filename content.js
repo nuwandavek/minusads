@@ -1,4 +1,3 @@
-const IS_AD_EVAL_INTERVAL = 5_000;
 let capturingIntervalId = null;
 let blockedMinutes = 0;
 let isBlockingAd = false; // Tracks if we're actively blocking ads
@@ -15,7 +14,7 @@ function startCapturing() {
   if (!capturingIntervalId) {
     capturingIntervalId = setInterval(() => {
       chrome.runtime.sendMessage({ action: "auto-capture" });
-    }, IS_AD_EVAL_INTERVAL);
+    }, 5_000);
     console.log("MinusAds: Started capturing every 10 seconds.");
   }
 }
