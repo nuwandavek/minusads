@@ -50,26 +50,28 @@
   /* ---------- TOGGLE SECTION ---------- */
   .toggle-section {
     margin-bottom: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: block;
+    /* justify-content: space-between;
+    align-items: center; */
     max-width: 400px; /* or whatever width feels good */
   }
   .toggle-header {
     display: flex;
-    justify-content: space-between;
+    /* justify-content: space-between; */
+    flex-direction: column;
     align-items: center;
+    gap: 0.5rem;         
   }
   .toggle-label {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
     margin-right: 6px;
   }
   .switch {
     position: relative;
     display: inline-block;
-    width: 40px;
-    height: 20px;
+    width: 100px;
+    height: 50px;
   }
   .switch input {
     opacity: 0;
@@ -87,8 +89,8 @@
   .slider:before {
     position: absolute;
     content: "";
-    height: 14px;
-    width: 14px;
+    height: 45px;
+    width: 45px;
     left: 3px;
     bottom: 3px;
     background-color: #fff;
@@ -99,7 +101,7 @@
     background-color: #55d6be;
   }
   input:checked + .slider:before {
-    transform: translateX(20px);
+    transform: translateX(50px);
   }
   .minutes-blocked {
     font-size: 12px;
