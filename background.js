@@ -21,6 +21,76 @@ async function scaleDown(imageBitmap, n) {
   return blobToDataUrl(scaledBlob);
 }
 
+
+async function gptCall(apiKey, scaledDataUrl) {
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        "model": "gpt-4o-mini",
+        "messages": [
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "image_url",
+                "image_url": {
+                  "url": scaledDataUrl,
+                  "detail": "low"
+                }
+              },
+              {
+                "type": "text",
+                "text": "I am trying to detect ads inside a video that's in a TV show. Is this specific screenshot an ad? Just respond with 'yes' or 'no', and give a 1 line reasoning for what exactly makes it an ad or not."
+              }
+            ]
+          }
+        ],
+        "response_format": {
+          "type": "json_schema",
+          "json_schema": {
+            "name": "ad_response",
+            "strict": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                // "reasoning": {
+                //   "type": "string",
+                //   "description": "Reasoning for the decision."
+                // },
+                "is_ad": {
+                  "type": "boolean",
+                  "description": "Indicates whether the content is an advertisement."
+                }
+              },
+              "required": [
+                "is_ad",
+                // "reasoning"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "temperature": 1,
+        "max_completion_tokens": 200,
+        "top_p": 1,
+        "frequency_penalty": 0,
+        "presence_penalty": 0
+    })
+  });
+
+  const res = await response.json();
+  gptResult = {
+    is_ad: JSON.parse(res.choices[0].message.content).is_ad,
+    fullResponse: res
+  }
+  return gptResult;
+}
+
+
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   if (message.action === "auto-capture") {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -47,67 +117,14 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
 
         let gptResult = { error: "No API key provided" };
 
-        if (apiKey) {
+        if (apiKey !== "") {
           try {
-            const response = await fetch("https://api.openai.com/v1/chat/completions", {
-              method: "POST",
-              headers: {
-                "Authorization": `Bearer ${apiKey}`,
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                  "model": "gpt-4o-mini",
-                  "messages": [
-                    {
-                      "role": "user",
-                      "content": [
-                        {
-                          "type": "image_url",
-                          "image_url": {
-                            "url": scaledDataUrl,
-                            "detail": "low"
-                          }
-                        },
-                        {
-                          "type": "text",
-                          "text": "I am trying to detect ads inside a video that's in a TV show. Is this specific screenshot an ad? Just respond with 'yes' or 'no'"
-                        }
-                      ]
-                    }
-                  ],
-                  "response_format": {
-                    "type": "json_schema",
-                    "json_schema": {
-                      "name": "ad_response",
-                      "strict": true,
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "is_ad": {
-                            "type": "boolean",
-                            "description": "Indicates whether the content is an advertisement."
-                          }
-                        },
-                        "required": [
-                          "is_ad"
-                        ],
-                        "additionalProperties": false
-                      }
-                    }
-                  },
-                  "temperature": 1,
-                  "max_completion_tokens": 200,
-                  "top_p": 1,
-                  "frequency_penalty": 0,
-                  "presence_penalty": 0
-              })
-            });
+            gptResult = await gptCall(apiKey, scaledDataUrl);
+            // gptResult = {
+            //   is_ad: true,
+            //   fullResponse: {}
+            // }
 
-            const res = await response.json();
-            gptResult = {
-              is_ad: JSON.parse(res.choices[0].message.content).is_ad,
-              fullResponse: res
-            }
           } catch (apiError) {
             gptResult = { error: String(apiError) };
             console.error("Error calling GPT-4o Vision API:", apiError);

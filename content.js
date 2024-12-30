@@ -2,6 +2,7 @@ let capturingIntervalId = null;
 let blockedMinutes = 0;
 let isBlockingAd = false; // Tracks if we're actively blocking ads
 let blockTimerId = null;
+const CHECK_INTERVAL = 5_000; // Check every 5 seconds
 
 // Initialize blocked minutes from storage
 chrome.storage.sync.get("blockedMinutes", (data) => {
@@ -14,8 +15,8 @@ function startCapturing() {
   if (!capturingIntervalId) {
     capturingIntervalId = setInterval(() => {
       chrome.runtime.sendMessage({ action: "auto-capture" });
-    }, 5_000);
-    console.log("MinusAds: Started capturing every 10 seconds.");
+    }, CHECK_INTERVAL);
+    console.log(`MinusAds: Started capturing every ${CHECK_INTERVAL} seconds.`);
   }
 }
 
@@ -65,41 +66,32 @@ function addOverlay() {
   overlay.style.bottom = "0";
   overlay.style.left = "0";
   overlay.style.width = "100%";
-  overlay.style.backgroundColor = "#2A2E35"; // Sleek, professional dark background
+  // overlay.style.backgroundColor = "#2A2E35"; // Sleek, professional dark background
   overlay.style.color = "#FFF";
   overlay.style.fontFamily = "'Roboto', sans-serif";
   overlay.style.zIndex = "9999";
-  overlay.style.boxShadow = "0px -2px 8px rgba(0, 0, 0, 0.5)";
   overlay.style.padding = "10px 20px";
   overlay.style.display = "flex";
-  overlay.style.justifyContent = "space-between";
+  overlay.style.justifyContent = "center";
+  overlay.style.flexDirection = "column";
   overlay.style.alignItems = "center";
   overlay.style.flexWrap = "wrap"; // Allows breaking on smaller screens
 
   // Step 3: Add content to the overlay
   overlay.innerHTML = `
+  <img src="https://raw.githubusercontent.com/nuwandavek/minusads/refs/heads/master/assets/santa3.gif"
+    alt="Ad Image" 
+    >
     <div style="flex: 1; min-width: 200px; font-size: 16px;">
       <strong style="color: #00A8E8;">Ad Detected:</strong> Muted for your convenience.
     </div>
-    <button id="close-overlay" style="
-      background: #00A8E8;
-      color: #FFF;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      min-width: 100px;">
-      Dismiss
-    </button>
   `;
 
   // Step 4: Add event listener to dismiss the overlay
-  const closeButton = overlay.querySelector("#close-overlay");
-  closeButton.addEventListener("click", () => {
-    removeOverlay();
-  });
+  // const closeButton = overlay.querySelector("#close-overlay");
+  // closeButton.addEventListener("click", () => {
+  //   removeOverlay();
+  // });
 
   // Step 5: Auto-mute on ad detect
   const videoElements = document.querySelectorAll("video, audio");
@@ -135,6 +127,8 @@ function removeOverlay() {
 chrome.runtime.onMessage.addListener((message) => {
   if (message.type === "SCREENSHOT_DATA") {
     const { scaledDataUrl, serverResult } = message;
+
+    console.log("MinusAds: Screenshot data received.", serverResult);
 
     // Check if GPT-4o Vision detected an ad
     if (serverResult.is_ad === true) {
