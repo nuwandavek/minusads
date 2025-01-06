@@ -30,7 +30,7 @@ async function gptCall(apiKey, scaledDataUrl) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-        "model": "gpt-4o-mini",
+        "model": "gpt-4o",
         "messages": [
           {
             "role": "user",
@@ -39,12 +39,22 @@ async function gptCall(apiKey, scaledDataUrl) {
                 "type": "image_url",
                 "image_url": {
                   "url": scaledDataUrl,
-                  "detail": "low"
+                  "detail": "high"
                 }
               },
               {
                 "type": "text",
-                "text": "I am trying to detect ads inside a video that's in a TV show. Is this specific screenshot an ad? Just respond with 'yes' or 'no', and give a 1 line reasoning for what exactly makes it an ad or not."
+                "text": `
+                Instructions:
+                I am trying to detect ads inside a video that's in a TV show. Is this specific screenshot an ad? Just respond with 'yes' or 'no', and give a 1 line reasoning for what exactly makes it an ad or not. The reasoning should contain which part of the screen it is focusing on to detect the ad. 
+                
+                Routine for detecting an ad:
+                1. Read all the text in the image and detect if "Ad" is present in the text. 
+                2. Usually there's a button that says "Skip Ad" or "Close Ad" in the bottom right corner of the screen.
+                3. If there's a logo of a brand, it's usually an ad.
+                4. Usually there's a small text in the top left corner or top right corner or bottom left corner or bottom right corner of the screen that says "Ad" or "Sponsored".
+                5. I add a overlay on the bottom of the screen to indicate that an ad is detected. This overlay is christmas themed. Ignore the overlay while detecting the ad. Also, the overlay contains "Ad Detected: Muted for your convenience." text - ignore this as well.
+                `
               }
             ]
           }
@@ -57,10 +67,10 @@ async function gptCall(apiKey, scaledDataUrl) {
             "schema": {
               "type": "object",
               "properties": {
-                // "reasoning": {
-                //   "type": "string",
-                //   "description": "Reasoning for the decision."
-                // },
+                "reasoning": {
+                  "type": "string",
+                  "description": "Reasoning for the decision"
+                },
                 "is_ad": {
                   "type": "boolean",
                   "description": "Indicates whether the content is an advertisement."
@@ -68,7 +78,7 @@ async function gptCall(apiKey, scaledDataUrl) {
               },
               "required": [
                 "is_ad",
-                // "reasoning"
+                "reasoning"
               ],
               "additionalProperties": false
             }
